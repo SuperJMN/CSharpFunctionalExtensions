@@ -31,7 +31,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         [Fact]
         public void When_mapping_success_to_same_type_successful_value_is_returned()
         {
-            var result = Either.Success<int, Error>(2);
+            var result = Result.Success<int, Error>(2);
             var a = result
                 .MapRight1(i => 5 * i)
                 .Handle(error => -1);
@@ -42,7 +42,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         [Fact]
         public void When_mapping_success_to_another_type_failure_value_is_returned()
         {
-            var result = Either.Failure<int, Error>(new Error("error"));
+            var result = Result.Failure<int, Error>(new Error("error"));
             var a = result
                 .MapRight1(i => i.ToString())
                 .Handle(error => error.Message);
@@ -53,7 +53,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         [Fact]
         public void When_mapping_failure_to_same_type_failure_value_is_returned()
         {
-            var result = Either.Failure<int, Error>(new Error("error"));
+            var result = Result.Failure<int, Error>(new Error("error"));
             var a = result
                 .MapRight1(i => 5 * i)
                 .Handle(error => -1);
@@ -64,7 +64,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         [Fact]
         public void When_mapping_failure_to_another_type_successful_value_is_returned()
         {
-            var result = Either.Success<int, Error>(2);
+            var result = Result.Success<int, Error>(2);
             var a = result
                 .MapRight1(i => i.ToString())
                 .Handle(error => error.Message);
@@ -82,20 +82,20 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
             var ea = Emit(a);
             var eb = Emit(b);
 
-            var ec = ea.Combine<ErrorList, string>(eb, (x, y) => Either.Success<string, ErrorList>(x + y), (e1, e2) => new ErrorList(e1.Concat(e2)));
+            var ec = ea.Combine<ErrorList, string>(eb, (x, y) => Result.Success<string, ErrorList>(x + y), (e1, e2) => new ErrorList(e1.Concat(e2)));
 
             var r = ec.Handle(list => string.Join(",", list));
             r.Should().Be(expected);
         }
 
-        private Either<string, ErrorList> Emit(string token)
+        private Result<string, ErrorList> Emit(string token)
         {
             if (token.EndsWith("s"))
             {
-                return Either.Success<string, ErrorList>(token);
+                return Result.Success<string, ErrorList>(token);
             }
 
-            return Either.Failure<string, ErrorList>(new ErrorList(token));
+            return Result.Failure<string, ErrorList>(new ErrorList(token));
         }
     }
 }

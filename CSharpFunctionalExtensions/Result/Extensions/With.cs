@@ -123,14 +123,14 @@ namespace CSharpFunctionalExtensions
 
     public static class ResultExtensions2
     {
-        public static T Value<T, E>(this Result<T, E> result)
+        public static Maybe<T> Value<T, E>(this Result<T, E> result)
         {
-            return result.Value;
+            return Maybe.From(result.Value);
         }
 
-        public static E Error<T, E>(this Result<T, E> result)
+        public static Maybe<E> Error<T, E>(this Result<T, E> result)
         {
-            return result.Error;
+            return Maybe.From(result.Error);
         }
     }
 

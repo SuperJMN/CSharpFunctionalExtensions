@@ -134,6 +134,19 @@ namespace CSharpFunctionalExtensions
         }
     }
 
+    public static class ResultExtensions3
+    {
+        public static Maybe<T> Value<T, E>(this Either<T, E> result)
+        {
+            return result.Value;
+        }
+
+        public static Maybe<E> Error<T, E>(this Either<T, E> result)
+        {
+            return result.Error;
+        }
+    }
+
     public class Either<T, E>
     {
         public Maybe<E> Error { get; }

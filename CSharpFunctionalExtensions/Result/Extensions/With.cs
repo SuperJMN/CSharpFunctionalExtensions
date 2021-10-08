@@ -75,14 +75,14 @@ namespace CSharpFunctionalExtensions
         {
             return self.Value.Match(
                 right => new Either<TNewRight, E>(map(right)),
-                () => new Either<TNewRight, E>(self.Error.GetValueOrDefault()));
+                () => Either.Error<E, TNewRight>(self.Error.GetValueOrDefault()));
         }
 
         public static Either<T, TNewLeft> MapLeft1<E, T, TNewLeft>(this Either<T, E> self,
             Func<E, TNewLeft> map)
         {
             return self.Error.Match(
-                left => new Either<T, TNewLeft>(map(left)),
+                left => Either.Error<TNewLeft, T>(map(left)),
                 () => new Either<T, TNewLeft>(self.Value.GetValueOrDefault()));
         }
 
@@ -91,7 +91,7 @@ namespace CSharpFunctionalExtensions
         {
             return self.Value.Match(
                 right => map(right),
-                () => new Either<TNewRight, E>(self.Error.GetValueOrDefault()));
+                () => Either.Error<E, TNewRight>(self.Error.GetValueOrDefault()));
         }
 
         public static Either<T, TNewLeft> MapLeft2<TNewLeft, E, T>(this Either<T, E> self,
@@ -100,11 +100,6 @@ namespace CSharpFunctionalExtensions
             return self.Error.Match(
                 left => map(left),
                 () => new Either<T, TNewLeft>(self.Value.GetValueOrDefault()));
-        }
-
-        public static Either<T, E> Error<E, T>(E left)
-        {
-            return new Either<T, E>(left);
         }
 
         public static T Handle<E, T>(this Either<T, E> self, Func<E, T> turnRight)

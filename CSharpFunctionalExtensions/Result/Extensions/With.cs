@@ -10,7 +10,7 @@ namespace CSharpFunctionalExtensions
         {
             var mapSuccess = a.MapLeft2(el1 => b
                     .MapLeft1(el2 => combineError(el1, el2))
-                    .MapRight2(_ => Either.Error<E, T>(el1)))
+                    .MapRight2(_ => Either.Failure<E, T>(el1)))
                 .MapRight2(x => b
                     .MapRight2(y => map(x, y))
                     .MapLeft1(el => el));
@@ -61,7 +61,7 @@ namespace CSharpFunctionalExtensions
             return ea
                 .MapLeft2(el1 => eb
                     .MapLeft1(el2 => combineError(el1, el2))
-                    .MapRight2(_ => Either.Error<E, T>(el1)))
+                    .MapRight2(_ => Either.Failure<E, T>(el1)))
                 .MapRight2(x => eb
                     .MapRight2(y => mapSuccess(x, y))
                     .MapLeft1(el => el));
@@ -75,14 +75,14 @@ namespace CSharpFunctionalExtensions
         {
             return self.Value.Match(
                 right => Either.Success<E, TNewRight>(map(right)),
-                () => Either.Error<E, TNewRight>(self.Error.GetValueOrDefault()));
+                () => Either.Failure<E, TNewRight>(self.Error.GetValueOrDefault()));
         }
 
         public static Either<T, TNewLeft> MapLeft1<E, T, TNewLeft>(this Either<T, E> self,
             Func<E, TNewLeft> map)
         {
             return self.Error.Match(
-                left => Either.Error<TNewLeft, T>(map(left)),
+                left => Either.Failure<TNewLeft, T>(map(left)),
                 () => Either.Success<TNewLeft, T>(self.Value.GetValueOrDefault()));
         }
 
@@ -91,7 +91,7 @@ namespace CSharpFunctionalExtensions
         {
             return self.Value.Match(
                 right => map(right),
-                () => Either.Error<E, TNewRight>(self.Error.GetValueOrDefault()));
+                () => Either.Failure<E, TNewRight>(self.Error.GetValueOrDefault()));
         }
 
         public static Either<T, TNewLeft> MapLeft2<TNewLeft, E, T>(this Either<T, E> self,
@@ -115,7 +115,7 @@ namespace CSharpFunctionalExtensions
             return new Either<T, E>(right);
         }
 
-        public static Either<T, E> Error<E, T>(E left)
+        public static Either<T, E> Failure<E, T>(E left)
         {
             return new Either<T, E>(left);
         }

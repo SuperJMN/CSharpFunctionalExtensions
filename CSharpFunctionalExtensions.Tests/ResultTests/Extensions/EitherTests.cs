@@ -42,7 +42,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         [Fact]
         public void When_mapping_success_to_another_type_failure_value_is_returned()
         {
-            var result = Either.Error<Error, int>(new Error("error"));
+            var result = Either.Failure<Error, int>(new Error("error"));
             var a = result
                 .MapRight1(i => i.ToString())
                 .Handle(error => error.Message);
@@ -53,7 +53,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         [Fact]
         public void When_mapping_failure_to_same_type_failure_value_is_returned()
         {
-            var result = Either.Error<Error, int>(new Error("error"));
+            var result = Either.Failure<Error, int>(new Error("error"));
             var a = result
                 .MapRight1(i => 5 * i)
                 .Handle(error => -1);
@@ -95,7 +95,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
                 return Either.Success<ErrorList, string>(token);
             }
 
-            return Either.Error<ErrorList, string>(new ErrorList(token));
+            return Either.Failure<ErrorList, string>(new ErrorList(token));
         }
     }
 }

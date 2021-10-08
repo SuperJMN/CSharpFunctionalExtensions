@@ -88,7 +88,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
             r.Should().Be(expected);
         }
 
-        private Either<ErrorList, string> Emit(string token)
+        private Either<string, ErrorList> Emit(string token)
         {
             if (token.EndsWith("s"))
             {

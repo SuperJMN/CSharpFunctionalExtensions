@@ -108,19 +108,6 @@ namespace CSharpFunctionalExtensions
         }
     }
 
-    public static class Either
-    {
-        public static Either<T, E> Success<T, E>(T right)
-        {
-            return new Either<T, E>(right);
-        }
-
-        public static Either<T, E> Failure<T, E>(E left)
-        {
-            return new Either<T, E>(left);
-        }
-    }
-
     public static class ResultExtensions2
     {
         public static Maybe<T> Value<T, E>(this Result<T, E> result)
@@ -160,6 +147,19 @@ namespace CSharpFunctionalExtensions
         public Either(T value)
         {
             Value = Maybe<T>.From(value);
+        }
+    }
+
+    public static class Either
+    {
+        public static Either<T, E> Success<T, E>(T right)
+        {
+            return new Either<T, E>(right);
+        }
+
+        public static Either<T, E> Failure<T, E>(E left)
+        {
+            return new Either<T, E>(left);
         }
     }
 }

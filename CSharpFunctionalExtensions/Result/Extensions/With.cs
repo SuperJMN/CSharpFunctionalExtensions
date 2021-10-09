@@ -71,43 +71,9 @@ namespace CSharpFunctionalExtensions
 
     public static class With
     {
-        public static Result<T, K> BindError<T, K, E>(this Result<T, E> self,
-            Func<E, Result<T, K>> map)
-        {
-            if (self.IsFailure)
-            {
-                return map(self.Error);
-            }
-
-            return Result.Success<T, K>(self.Value);
-        }
-
         public static T Handle<T, E>(this Result<T, E> self, Func<E, T> turnRight)
         {
-            return self.Error().Match(turnRight, () => self.Value().GetValueOrDefault());
-        }
-    }
-
-    public static class ResultExtensions2
-    {
-        public static Maybe<T> Value<T, E>(this Result<T, E> result)
-        {
-            if (result.IsSuccess)
-            {
-                return Maybe<T>.From(result.Value);
-            }
-
-            return Maybe<T>.None;
-        }
-
-        public static Maybe<E> Error<T, E>(this Result<T, E> result)
-        {
-            if (result.IsFailure)
-            {
-                return Maybe<E>.From(result.Error);
-            }
-
-            return Maybe<E>.None;
+            return self.OnFailureCompensate(e => turnRight(e)).Value;
         }
     }
 }

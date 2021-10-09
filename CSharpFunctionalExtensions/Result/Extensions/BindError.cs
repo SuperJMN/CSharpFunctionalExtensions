@@ -4,12 +4,15 @@ namespace CSharpFunctionalExtensions
 {
     public partial class ResultExtensions
     {
-        public static Result<K, E> BindError<T, K, E>(this Result<T, E> self,
-            Func<T, Result<K, E>> map)
+        public static Result<T, K> BindError<T, K, E>(this Result<T, E> self,
+            Func<E, Result<T, K>> map)
         {
-            return self.Value().Match(
-                right => map(right),
-                () => Result.Failure<K, E>(self.Error().GetValueOrDefault()));
+            if (self.IsFailure)
+            {
+                return map(self.Error);
+            }
+
+            return Result.Success<T, K>(self.Value);
         }
     }
 }

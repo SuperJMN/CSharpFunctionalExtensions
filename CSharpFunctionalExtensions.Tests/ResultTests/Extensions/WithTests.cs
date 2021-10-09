@@ -1,65 +1,47 @@
-﻿using Xunit;
+﻿using System.Collections.Generic;
+using System.Linq;
+using FluentAssertions;
+using Xunit;
 
 namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
 {
     public class WithTests
     {
-        [Fact]
-        public void Both_results_successful_return_value_from_selector()
+        [Theory]
+        [InlineData("af", "bs", "af")]
+        [InlineData("as", "bf", "bf")]
+        [InlineData("af", "bf", "af,bf")]
+        [InlineData("as", "bs", "asbs")]
+        public void Verify(string a, string b, string expected)
         {
-            var left = Result.Success(new T1());
-            var right = Result.Success(new T2());
-            var expected = new E();
-            var actual = left.With(right, (l, r) => expected);
-            actual.Value.Should().Be(expected);
+            var ea = Emit(a);
+            var eb = Emit(b);
+
+            var ec = ea.With<ErrorList, string>(eb, (x, y) => Result.Success<string, ErrorList>(x + y), (e1, e2) => new ErrorList(e1.Concat(e2)));
+
+            var r = ec.Handle(list => string.Join(",", list));
+            r.Should().Be(expected);
         }
 
-        [Fact]
-        public void Failed_left_returns_a_failure()
+        private Result<string, ErrorList> Emit(string token)
         {
-            var left = Result.Failure<T1>("First result failed");
-            var right = Result.Success(new T2());
-            var e = new E();
-            var result = left.With(right, (l, r) => e);
-            result.IsFailure.Should().BeTrue("The result should be a failure");
-            result.Error.Should().Be("First result failed");
+            if (token.EndsWith("s"))
+            {
+                return Result.Success<string, ErrorList>(token);
+            }
+
+            return Result.Failure<string, ErrorList>(new ErrorList(token));
         }
 
-        [Fact]
-        public void Failed_right_returns_a_failure()
+        private class ErrorList : List<string>
         {
-            var left = Result.Success(new T1());
-            var right = Result.Failure<T2>("Second result failed");
-            var expected = new E();
-            var actual = left.With(right, (l, r) => expected);
-            actual.IsFailure.Should().BeTrue("The result should be a failure");
-            actual.Error.Should().Be("Second result failed");
-        }
+            public ErrorList(IEnumerable<string> items) : base(items)
+            {
+            }
 
-        [Fact]
-        public void Both_results_fail_error_combination_is_returned()
-        {
-            var left = Result.Failure<T1>("First result failed");
-            var right = Result.Failure<T2>("Second result failed");
-            var expected = new E();
-            var actual = left.With(right, (l, r) => expected);
-            actual.Value.Should().Be("First result failed" + Result.ErrorMessagesSeparator + "Second result failed");
+            public ErrorList(string item) : this(new[] { item })
+            {
+            }
         }
-
-        private class T1
-        {
-        }
-
-        private class T2
-        {
-        }
-
-        private class E
-        {
-        }
-    }
-
-    public static class WithExtensions
-    {
     }
 }

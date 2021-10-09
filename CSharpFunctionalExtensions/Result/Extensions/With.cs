@@ -74,9 +74,12 @@ namespace CSharpFunctionalExtensions
         public static Result<T, K> BindError<T, K, E>(this Result<T, E> self,
             Func<E, Result<T, K>> map)
         {
-            return self.Error().Match(
-                left => map(left),
-                () => Result.Success<T, K>(self.Value().GetValueOrDefault()));
+            if (self.IsFailure)
+            {
+                return map(self.Error);
+            }
+
+            return Result.Success<T, K>(self.Value);
         }
 
         public static T Handle<T, E>(this Result<T, E> self, Func<E, T> turnRight)

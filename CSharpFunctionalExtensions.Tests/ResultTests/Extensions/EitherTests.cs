@@ -82,7 +82,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
             var ea = Emit(a);
             var eb = Emit(b);
 
-            var ec = ea.Combine<ErrorList, string>(eb, (x, y) => Result.Success<string, ErrorList>(x + y), (e1, e2) => new ErrorList(e1.Concat(e2)));
+            var ec = ea.With<ErrorList, string>(eb, (x, y) => Result.Success<string, ErrorList>(x + y), (e1, e2) => new ErrorList(e1.Concat(e2)));
 
             var r = ec.Handle(list => string.Join(",", list));
             r.Should().Be(expected);

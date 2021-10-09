@@ -8,7 +8,7 @@ namespace CSharpFunctionalExtensions
             Result<K, E> b,
             Func<T, K, Result<R, E>> map, Func<E, E, E> combineError)
         {
-            var mapSuccess = a.MapLeft2(el1 => b
+            var mapSuccess = a.Bind(el1 => b
                     .MapLeft1(el2 => combineError(el1, el2))
                     .MapRight2(_ => Result.Failure<T, E>(el1)))
                 .MapRight2(x => b
@@ -59,7 +59,7 @@ namespace CSharpFunctionalExtensions
             Func<T, T, Result<T, E>> mapSuccess, Func<E, E, E> combineError)
         {
             return ea
-                .MapLeft2(el1 => eb
+                .Bind(el1 => eb
                     .MapLeft1(el2 => combineError(el1, el2))
                     .MapRight2(_ => Result.Failure<T, E>(el1)))
                 .MapRight2(x => eb
@@ -70,39 +70,39 @@ namespace CSharpFunctionalExtensions
 
     public static class With
     {
-        public static Result<TNewRight, E> MapRight1<E, T, TNewRight>(this Result<T, E> self,
-            Func<T, TNewRight> map)
+        public static Result<K, E> MapRight1<T, K, E>(this Result<T, E> self,
+            Func<T, K> map)
         {
             return self.Value().Match(
-                right => Result.Success<TNewRight, E>(map(right)),
-                () => Result.Failure<TNewRight, E>(self.Error().GetValueOrDefault()));
+                right => Result.Success<K, E>(map(right)),
+                () => Result.Failure<K, E>(self.Error().GetValueOrDefault()));
         }
 
-        public static Result<T, TNewLeft> MapLeft1<E, T, TNewLeft>(this Result<T, E> self,
-            Func<E, TNewLeft> map)
+        public static Result<T, K> MapLeft1<T, K, E>(this Result<T, E> self,
+            Func<E, K> map)
         {
             return self.Error().Match(
-                left => Result.Failure<T, TNewLeft>(map(left)),
-                () => Result.Success<T, TNewLeft>(self.Value().GetValueOrDefault()));
+                left => Result.Failure<T, K>(map(left)),
+                () => Result.Success<T, K>(self.Value().GetValueOrDefault()));
         }
 
-        public static Result<TNewRight, E> MapRight2<E, T, TNewRight>(this Result<T, E> self,
-            Func<T, Result<TNewRight, E>> map)
+        public static Result<K, E> MapRight2<T, K, E>(this Result<T, E> self,
+            Func<T, Result<K, E>> map)
         {
             return self.Value().Match(
                 right => map(right),
-                () => Result.Failure<TNewRight, E>(self.Error().GetValueOrDefault()));
+                () => Result.Failure<K, E>(self.Error().GetValueOrDefault()));
         }
 
-        public static Result<T, TNewLeft> MapLeft2<TNewLeft, E, T>(this Result<T, E> self,
-            Func<E, Result<T, TNewLeft>> map)
+        public static Result<T, K> Bind<T, K, E>(this Result<T, E> self,
+            Func<E, Result<T, K>> map)
         {
             return self.Error().Match(
                 left => map(left),
-                () => Result.Success<T, TNewLeft>(self.Value().GetValueOrDefault()));
+                () => Result.Success<T, K>(self.Value().GetValueOrDefault()));
         }
 
-        public static T Handle<E, T>(this Result<T, E> self, Func<E, T> turnRight)
+        public static T Handle<T, E>(this Result<T, E> self, Func<E, T> turnRight)
         {
             return self.Error().Match(turnRight, () => self.Value().GetValueOrDefault());
         }

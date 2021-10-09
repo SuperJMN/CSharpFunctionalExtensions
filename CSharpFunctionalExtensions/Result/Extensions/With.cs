@@ -71,18 +71,6 @@ namespace CSharpFunctionalExtensions
 
     public static class With
     {
-        public static Result<T, K> MapLeft1<T, K, E>(this Result<T, E> self,
-            Func<E, K> map)
-        {
-            return self.MapError(map);
-        }
-
-        public static Result<K, E> MapRight2<T, K, E>(this Result<T, E> self,
-            Func<T, Result<K, E>> map)
-        {
-            return self.Bind(map);
-        }
-
         public static Result<T, K> BindError<T, K, E>(this Result<T, E> self,
             Func<E, Result<T, K>> map)
         {

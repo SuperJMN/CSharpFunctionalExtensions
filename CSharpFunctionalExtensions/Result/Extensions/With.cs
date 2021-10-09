@@ -2,7 +2,7 @@
 
 namespace CSharpFunctionalExtensions
 {
-    public static class CombineExtensions
+    public static partial class ResultExtensions
     {
         public static Result<T, E> With<E, T>(
             this Result<T, E> a,

@@ -5,7 +5,7 @@ using Xunit;
 
 namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
 {
-    public class WithTests
+    public class WithResultOfTAndETests
     {
         [Theory]
         [InlineData("af", "bs", "af")]
@@ -42,6 +42,16 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
             public ErrorList(string item) : this(new[] { item })
             {
             }
+        }
+
+        [Fact]
+        public void Failures_should_combine()
+        {
+            var a = Result.Failure<int, string>("Error 1");
+            var b = Result.Failure<int, string>("Error 2");
+            var r = a.With(b, (x, y) => x + y, (s, s1) => "combined");
+            r.IsFailure.Should().BeTrue();
+            r.Error.Should().Be("combined");
         }
     }
 }

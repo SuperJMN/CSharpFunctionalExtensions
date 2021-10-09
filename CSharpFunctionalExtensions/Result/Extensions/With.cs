@@ -18,6 +18,20 @@ namespace CSharpFunctionalExtensions
                     .MapError(el => el));
         }
 
+        public static Result<T, E> With<T, E>(
+            this Result<T, E> a,
+            Result<T, E> b,
+            Func<T, T, T> mapSuccess, Func<E, E, E> combineError)
+        {
+            return a
+                .BindError(el1 => b
+                    .MapError(el2 => combineError(el1, el2))
+                    .Bind(_ => Result.Failure<T, E>(el1)))
+                .Bind(x => b
+                    .Map(y => mapSuccess(x, y))
+                    .MapError(el => el));
+        }
+
         public static Result<R, E> With<T1, T2, E, R>(this Result<T1, E> a,
             Result<T2, E> b,
             Func<T1, T2, Result<R, E>> map, Func<E, E, E> combineError)
@@ -66,6 +80,34 @@ namespace CSharpFunctionalExtensions
                 combineError);
             return r.With(e, (prev, cur) => onSuccess(prev.Item1, prev.Item2, prev.Item3, prev.Item4, cur),
                 combineError);
+        }
+
+        public static Result<TResult> With<T, K, TResult>(
+            this Result<T> a,
+            Result<K> b,
+            Func<T, K, Result<TResult>> mapSuccess)
+        {
+            return a
+                .BindError(e1 => b
+                    .MapError(e2 => string.Join(Result.ErrorMessagesSeparator, e1, e2))
+                    .Bind(_ => Result.Failure<T>(e1))
+                ).Bind(x => b
+                    .Bind(y => mapSuccess(x, y))
+                    .MapError(e => e));
+        }
+
+        public static Result<TResult> With<T, K, TResult>(
+            this Result<T> a,
+            Result<K> b,
+            Func<T, K, TResult> mapSuccess)
+        {
+            return a
+                .BindError(e1 => b
+                    .MapError(e2 => string.Join(Result.ErrorMessagesSeparator, e1, e2))
+                    .Bind(_ => Result.Failure<T>(e1))
+                ).Bind(x => b
+                    .Map(y => mapSuccess(x, y))
+                    .MapError(e => e));
         }
     }
 

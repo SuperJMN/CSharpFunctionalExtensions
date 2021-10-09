@@ -33,7 +33,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         {
             var result = Result.Success<int, Error>(2);
             var a = result
-                .MapRight1(i => 5 * i)
+                .Map(i => 5 * i)
                 .Handle(error => -1);
 
             a.Should().Be(10);
@@ -44,7 +44,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         {
             var result = Result.Failure<int, Error>(new Error("error"));
             var a = result
-                .MapRight1(i => i.ToString())
+                .Map(i => i.ToString())
                 .Handle(error => error.Message);
 
             a.Should().Be("error");
@@ -55,7 +55,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         {
             var result = Result.Failure<int, Error>(new Error("error"));
             var a = result
-                .MapRight1(i => 5 * i)
+                .Map(i => 5 * i)
                 .Handle(error => -1);
 
             a.Should().Be(-1);
@@ -66,7 +66,7 @@ namespace CSharpFunctionalExtensions.Tests.ResultTests.Extensions
         {
             var result = Result.Success<int, Error>(2);
             var a = result
-                .MapRight1(i => i.ToString())
+                .Map(i => i.ToString())
                 .Handle(error => error.Message);
 
             a.Should().Be("2");

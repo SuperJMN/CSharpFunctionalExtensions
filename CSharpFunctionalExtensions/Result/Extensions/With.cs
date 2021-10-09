@@ -70,13 +70,13 @@ namespace CSharpFunctionalExtensions
 
     public static class With
     {
-        public static Result<K, E> MapRight1<T, K, E>(this Result<T, E> self,
-            Func<T, K> map)
-        {
-            return self.Value().Match(
-                right => Result.Success<K, E>(map(right)),
-                () => Result.Failure<K, E>(self.Error().GetValueOrDefault()));
-        }
+        //public static Result<K, E> Map<T, K, E>(this Result<T, E> self,
+        //    Func<T, K> map)
+        //{
+        //    return self.Value().Match(
+        //        right => Result.Success<K, E>(map(right)),
+        //        () => Result.Failure<K, E>(self.Error().GetValueOrDefault()));
+        //}
 
         public static Result<T, K> MapLeft1<T, K, E>(this Result<T, E> self,
             Func<E, K> map)

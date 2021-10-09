@@ -4,16 +4,31 @@ namespace CSharpFunctionalExtensions
 {
     public static class CombineExtensions
     {
-        public static Result<R, E> Combine<E, T, K, R>(this Result<T, E> a,
-            Result<K, E> b,
-            Func<T, K, Result<R, E>> map, Func<E, E, E> combineError)
+        public static Result<T, E> Combine<E, T>(
+            this Result<T, E> ea,
+            Result<T, E> eb,
+            Func<T, T, Result<T, E>> mapSuccess, Func<E, E, E> combineError)
         {
-            var mapSuccess = a.BindError(el1 => b
-                    .MapLeft1(el2 => combineError(el1, el2))
-                    .MapRight2(_ => Result.Failure<T, E>(el1)))
-                .MapRight2(x => b
-                    .MapRight2(y => map(x, y))
-                    .MapLeft1(el => el));
+            return ea
+                .BindError(el1 => eb
+                    .MapError(el2 => combineError(el1, el2))
+                    .Bind(_ => Result.Failure<T, E>(el1)))
+                .Bind(x => eb
+                    .Bind(y => mapSuccess(x, y))
+                    .MapError(el => el));
+        }
+
+        public static Result<R, E> Combine<E, T1, T2, R>(this Result<T1, E> a,
+            Result<T2, E> b,
+            Func<T1, T2, Result<R, E>> map, Func<E, E, E> combineError)
+        {
+            var mapSuccess = 
+                a.BindError(el1 => b
+                    .MapError(el2 => combineError(el1, el2))
+                    .Bind(_ => Result.Failure<T1, E>(el1)))
+                .Bind(x => b
+                    .Bind(y => map(x, y))
+                    .MapError(el => el));
 
             return mapSuccess;
         }
@@ -52,20 +67,6 @@ namespace CSharpFunctionalExtensions
             return r.Combine(e, (prev, cur) => onSuccess(prev.Item1, prev.Item2, prev.Item3, prev.Item4, cur),
                 combineError);
         }
-
-        public static Result<T, E> Combine<E, T>(
-            this Result<T, E> ea,
-            Result<T, E> eb,
-            Func<T, T, Result<T, E>> mapSuccess, Func<E, E, E> combineError)
-        {
-            return ea
-                .BindError(el1 => eb
-                    .MapLeft1(el2 => combineError(el1, el2))
-                    .Bind(_ => Result.Failure<T, E>(el1)))
-                .MapRight2(x => eb
-                    .Bind(y => mapSuccess(x, y))
-                    .MapLeft1(el => el));
-        }
     }
 
     public static class With
@@ -73,9 +74,7 @@ namespace CSharpFunctionalExtensions
         public static Result<T, K> MapLeft1<T, K, E>(this Result<T, E> self,
             Func<E, K> map)
         {
-            return self.Error().Match(
-                left => Result.Failure<T, K>(map(left)),
-                () => Result.Success<T, K>(self.Value().GetValueOrDefault()));
+            return self.MapError(map);
         }
 
         public static Result<K, E> MapRight2<T, K, E>(this Result<T, E> self,

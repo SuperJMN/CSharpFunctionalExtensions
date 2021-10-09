@@ -8,7 +8,7 @@ namespace CSharpFunctionalExtensions
             Result<K, E> b,
             Func<T, K, Result<R, E>> map, Func<E, E, E> combineError)
         {
-            var mapSuccess = a.Bind(el1 => b
+            var mapSuccess = a.BindError(el1 => b
                     .MapLeft1(el2 => combineError(el1, el2))
                     .MapRight2(_ => Result.Failure<T, E>(el1)))
                 .MapRight2(x => b
@@ -59,11 +59,11 @@ namespace CSharpFunctionalExtensions
             Func<T, T, Result<T, E>> mapSuccess, Func<E, E, E> combineError)
         {
             return ea
-                .Bind(el1 => eb
+                .BindError(el1 => eb
                     .MapLeft1(el2 => combineError(el1, el2))
-                    .MapRight2(_ => Result.Failure<T, E>(el1)))
+                    .Bind(_ => Result.Failure<T, E>(el1)))
                 .MapRight2(x => eb
-                    .MapRight2(y => mapSuccess(x, y))
+                    .Bind(y => mapSuccess(x, y))
                     .MapLeft1(el => el));
         }
     }
@@ -81,12 +81,10 @@ namespace CSharpFunctionalExtensions
         public static Result<K, E> MapRight2<T, K, E>(this Result<T, E> self,
             Func<T, Result<K, E>> map)
         {
-            return self.Value().Match(
-                right => map(right),
-                () => Result.Failure<K, E>(self.Error().GetValueOrDefault()));
+            return self.Bind(map);
         }
 
-        public static Result<T, K> Bind<T, K, E>(this Result<T, E> self,
+        public static Result<T, K> BindError<T, K, E>(this Result<T, E> self,
             Func<E, Result<T, K>> map)
         {
             return self.Error().Match(

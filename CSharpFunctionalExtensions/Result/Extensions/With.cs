@@ -5,15 +5,15 @@ namespace CSharpFunctionalExtensions
     public static class CombineExtensions
     {
         public static Result<T, E> With<E, T>(
-            this Result<T, E> ea,
-            Result<T, E> eb,
+            this Result<T, E> a,
+            Result<T, E> b,
             Func<T, T, Result<T, E>> mapSuccess, Func<E, E, E> combineError)
         {
-            return ea
-                .BindError(el1 => eb
+            return a
+                .BindError(el1 => b
                     .MapError(el2 => combineError(el1, el2))
                     .Bind(_ => Result.Failure<T, E>(el1)))
-                .Bind(x => eb
+                .Bind(x => b
                     .Bind(y => mapSuccess(x, y))
                     .MapError(el => el));
         }

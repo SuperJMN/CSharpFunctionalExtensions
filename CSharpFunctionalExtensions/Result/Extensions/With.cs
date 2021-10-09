@@ -4,7 +4,7 @@ namespace CSharpFunctionalExtensions
 {
     public static partial class ResultExtensions
     {
-        public static Result<T, E> With<E, T>(
+        public static Result<T, E> With<T, E>(
             this Result<T, E> a,
             Result<T, E> b,
             Func<T, T, Result<T, E>> mapSuccess, Func<E, E, E> combineError)
@@ -18,7 +18,7 @@ namespace CSharpFunctionalExtensions
                     .MapError(el => el));
         }
 
-        public static Result<R, E> With<E, T1, T2, R>(this Result<T1, E> a,
+        public static Result<R, E> With<T1, T2, E, R>(this Result<T1, E> a,
             Result<T2, E> b,
             Func<T1, T2, Result<R, E>> map, Func<E, E, E> combineError)
         {
@@ -33,7 +33,7 @@ namespace CSharpFunctionalExtensions
             return mapSuccess;
         }
 
-        public static Result<TResult, E> With<E, T1, T2, T3, TResult>(this
+        public static Result<TResult, E> With<T1, T2, T3, E, TResult>(this
                 Result<T1, E> a,
             Result<T2, E> b,
             Result<T3, E> c,
@@ -43,7 +43,7 @@ namespace CSharpFunctionalExtensions
             return r.With(c, (o, arg3) => onSuccess(o.Item1, o.Item2, arg3), combineError);
         }
 
-        public static Result<TResult, E> With<E, T1, T2, T3, T4, TResult>(
+        public static Result<TResult, E> With<T1, T2, T3, T4, E, TResult>(
             Result<T1, E> a,
             Result<T2, E> b,
             Result<T3, E> c,
@@ -54,7 +54,7 @@ namespace CSharpFunctionalExtensions
             return r.With(d, (prev, cur) => onSuccess(prev.Item1, prev.Item2, prev.Item3, cur), combineError);
         }
 
-        public static Result<TResult, E> With<E, T1, T2, T3, T4, T5, TResult>(
+        public static Result<TResult, E> With<T1, T2, T3, T4, T5, E, TResult>(
             Result<T1, E> a,
             Result<T2, E> b,
             Result<T3, E> c,

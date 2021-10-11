@@ -10,9 +10,9 @@ namespace CSharpFunctionalExtensions
             Func<T, T, Result<T, E>> func, Func<E, E, E> combineError)
         {
             return a
-                .BindError(el1 => b
-                    .MapError(el2 => combineError(el1, el2))
-                    .Bind(_ => Result.Failure<T, E>(el1)))
+                .BindError(e1 => b
+                    .MapError(e2 => combineError(e1, e2))
+                    .Bind(_ => Result.Failure<T, E>(e1)))
                 .Bind(x => b
                     .Bind(y => func(x, y))
                     .MapError(el => el));
@@ -24,9 +24,9 @@ namespace CSharpFunctionalExtensions
             Func<T1, T2, R> func, Func<E, E, E> combineError)
         {
             var mapSuccess =
-                a.BindError(el1 => b
-                        .MapError(el2 => combineError(el1, el2))
-                        .Bind(_ => Result.Failure<T1, E>(el1)))
+                a.BindError(e1 => b
+                        .MapError(e2 => combineError(e1, e2))
+                        .Bind(_ => Result.Failure<T1, E>(e1)))
                     .Bind(x => b
                         .Map(y => func(x, y))
                         .MapError(el => el));
@@ -39,9 +39,9 @@ namespace CSharpFunctionalExtensions
             Func<T1, T2, Result<R, E>> func, Func<E, E, E> combineError)
         {
             var mapSuccess =
-                a.BindError(el1 => b
-                        .MapError(el2 => combineError(el1, el2))
-                        .Bind(_ => Result.Failure<T1, E>(el1)))
+                a.BindError(e1 => b
+                        .MapError(e2 => combineError(e1, e2))
+                        .Bind(_ => Result.Failure<T1, E>(e1)))
                     .Bind(x => b
                         .Bind(y => func(x, y))
                         .MapError(el => el));
